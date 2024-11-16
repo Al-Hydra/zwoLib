@@ -86,13 +86,3 @@ if __name__ == "__main__":
 
     pr.disable()
     pr.print_stats(sort='time')
-
-    '''
-    for entity in zwo.Entities:
-        if entity.Type == zwoTypes.Mesh:
-            print(entity.Name)
-            for v in entity.VertexBuffer.Vertices:
-                print(v.Position.x, v.Position.y, v.Position.z)
-            for f in entity.FaceBuffer.Faces:
-                print(f.Indices)
-    '''
