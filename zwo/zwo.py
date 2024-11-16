@@ -1,13 +1,13 @@
-from PyBinaryReader.binary_reader import *
+from ..utils.PyBinaryReader.binary_reader import *
 from enum import Enum
-from zwoTypes import zwoTypes
-from zwoMaterial import zwoMaterial
-from zwoMesh import zwoMesh
-from zwoCamera import zwoCamera
-from zwoSkeleton import zwoSkeleton
-from zwoSkeletalAnimation import zwoSkeletalAnimation
-from zwoAnimation import zwoAnimation
-from zwoNode import zwoNode
+from .zwoTypes import zwoTypes
+from .zwoMaterial import zwoMaterial
+from .zwoMesh import zwoMesh
+from .zwoCamera import zwoCamera
+from .zwoSkeleton import zwoSkeleton
+from .zwoSkeletalAnimation import zwoSkeletalAnimation
+from .zwoAnimation import zwoAnimation
+from .zwoNode import zwoNode
 import cProfile
 
 class zwoFile(BrStruct):

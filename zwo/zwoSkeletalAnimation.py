@@ -1,11 +1,8 @@
-from PyBinaryReader.binary_reader import *
-from PyBinaryReader.binary_reader.binary_reader import BinaryReader
-from zwoEntity import zwoEntity
-from zwoEntity3D import zwoEntity3D
-from zwoTypes import zwoTypes
-from zwoHelpers import zwoVector
-from zwoHelpers import zwoMatrix
-from zwoHelpers import zwoQuaternion
+from ..utils.PyBinaryReader.binary_reader import *
+from .zwoEntity import zwoEntity
+from .zwoEntity3D import zwoEntity3D
+from .zwoTypes import zwoTypes
+from .zwoHelpers import zwoVector, zwoQuaternion
 
 
 

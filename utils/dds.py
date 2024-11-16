@@ -1,6 +1,6 @@
-from PyBinaryReader.binary_reader.binary_reader import BinaryReader, Endian
+from .PyBinaryReader.binary_reader.binary_reader import BinaryReader, Endian
 
-from brDDS import BrDDS, BrDDS_Header, BrDDS_PixelFormat, BrDDS_DX10_Header
+from .brDDS import BrDDS, BrDDS_Header, BrDDS_PixelFormat, BrDDS_DX10_Header
 
 
 class DDS:

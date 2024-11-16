@@ -1,4 +1,4 @@
-from PyBinaryReader.binary_reader import *
+from .PyBinaryReader.binary_reader import *
 from enum import Enum
 from PIL import Image
 

@@ -1,7 +1,7 @@
 from array import array
 from enum import Enum, IntEnum, IntFlag
 
-from PyBinaryReader.binary_reader import BinaryReader, BrStruct
+from .PyBinaryReader.binary_reader import BinaryReader, BrStruct
 
 
 class BrDDS(BrStruct):

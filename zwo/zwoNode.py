@@ -1,6 +1,6 @@
-from PyBinaryReader.binary_reader import *
-from zwoHelpers import zwoVector
-from zwoTypes import zwoTypes
+from ..utils.PyBinaryReader.binary_reader import *
+from .zwoHelpers import zwoVector
+from .zwoTypes import zwoTypes
 class zwoNode(BrStruct):
     def __init__(self):
         self.Type = zwoTypes.Node

@@ -1,5 +1,5 @@
-from PyBinaryReader.binary_reader import *
-from zwoHelpers import zwoTransformer
+from ..utils.PyBinaryReader.binary_reader import *
+from .zwoHelpers import zwoTransformer
 
 class zwoEntity3D(BrStruct):
     def __init__(self):
@@ -48,5 +48,46 @@ class zwoEntity3D(BrStruct):
 
         if (self.flags1 & 0x20) != 0:
             self.unk5 = br.read_uint32()
+            
+    
+    def __br_write__(self, br: BinaryReader):
+        br.write_uint32(self.MaterialCount)
+        for m in self.Materials:
+            br.write_uint32(len(m))
+            br.write_str(m)
+        
+        br.write_uint32(self.flags1)
+        br.write_uint32(self.flags2)
+        br.write_uint32(self.unk1)
+        
+        if (self.flags2 & 0x10000) != 0:
+            br.write_uint32(self.value1)
+        
+        if (self.flags2 & 0x20000) != 0:
+            br.write_uint32(self.value2)
+        
+        if (self.flags1 & 4) != 0:
+            br.write_uint32(len(self.Param1))
+            br.write_str(self.Param1)
+            br.write_uint32(len(self.Param2))
+            br.write_str(self.Param2)
+        
+        br.write_uint32(self.unk2)
+        
+        if (self.flags1 & 0x40) != 0:
+            br.write_uint32(self.unk2)
+        
+        if (self.flags1 & 1) != 0:
+            br.write_uint32(self.MeshType)
+            
+        if (self.flags1 & 2) != 0:
+            br.write_uint32(len(self.Param1))
+            br.write_str(self.Param1)
+            br.write_struct(self.Transformer1)
+            
+        if (self.flags1 & 0x20) != 0:
+            br.write_uint32(self.unk5)
+            
+
 
 

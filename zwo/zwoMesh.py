@@ -1,9 +1,8 @@
-from PyBinaryReader.binary_reader import *
-from PyBinaryReader.binary_reader.binary_reader import BinaryReader
-from zwoTypes import zwoTypes
-from zwoEntity import zwoEntity
-from zwoEntity3D import zwoEntity3D
-from zwoHelpers import zwoVector, zwoQuaternion, zwoMatrix, zwoOBB
+from ..utils.PyBinaryReader.binary_reader import *
+from .zwoTypes import zwoTypes
+from .zwoEntity import zwoEntity
+from .zwoEntity3D import zwoEntity3D
+from .zwoHelpers import zwoVector, zwoQuaternion, zwoMatrix, zwoOBB
 import json
 
 class zwoMesh(BrStruct):
@@ -13,12 +12,19 @@ class zwoMesh(BrStruct):
         self.Size = 0
         self.Name = ""
         self.Materials = []
-        self.VertexBuffer = []
+        self.VertexBuffers = []
         self.FaceBuffer = []
         self.Data = None
-
+        self.VertexBufferFlag = 0
+        self.unk2 = 0
+        self.unk3 = 0
+        self.unk4 = 0
+        
     def __br_read__(self, br:BinaryReader):
         self.Entity: zwoEntity = br.read_struct(zwoEntity)
+        
+        self.Name = self.Entity.Name
+        
         self.Entity3D: zwoEntity3D = br.read_struct(zwoEntity3D)
         if self.Entity3D.flags1 != 2:
             self.Geometry = br.read_struct(zwoGeometry)
@@ -42,25 +48,70 @@ class zwoMesh(BrStruct):
             self.FaceBuffer = br.read_struct(FaceBuffer)
     
     def __br_write__(self, br:BinaryReader):
-        pass
+        
+        mesh_buf = BinaryReader(endianness=Endian.BIG, encoding='cp932')
+        
+        mesh_buf.write_uint8(self.Entity.HeaderType)
+        
+        if self.Entity.HeaderType == 5:
+            mesh_buf.write_uint32(len(self.Entity.Name))
+            mesh_buf.write_str(self.Entity.Name)
+            mesh_buf.write_uint32(self.Entity.Type)
+        
+        elif self.Entity.HeaderType == 6:
+            mesh_buf.write_uint32(len(self.Entity.Name))
+            mesh_buf.write_str(self.Entity.Name)
+            mesh_buf.write_uint32(self.Entity.Type)
+            mesh_buf.write_uint32(self.Entity.unk2)
+            mesh_buf.write_uint32(self.Entity.unk3)
+            mesh_buf.write_uint32(self.Entity.unk4)
+            mesh_buf.write_uint32(self.Entity.unk5)
+            mesh_buf.write_uint32(self.Entity.unk6)
+            
+        mesh_buf.write_struct(self.Entity3D)
+        mesh_buf.write_struct(self.Geometry)
+        mesh_buf.write_uint32(self.VertexBufferFlag)
+        mesh_buf.write_uint32(self.unk2)
+        
+        if self.Entity3D.MeshType == 2:
+            mesh_buf.write_float(self.unk3)
+            mesh_buf.write_float(self.unk4)
+        
+        for vb in self.VertexBuffers:
+            mesh_buf.write_struct(vb)
+
+        mesh_buf.write_struct(self.FaceBuffer)
+        
+        mesh_size = mesh_buf.size()
+        br.write_uint32(mesh_size + 4)
+        br.write_bytes(bytes(mesh_buf.buffer()))
 
 
 class zwoGeometry(BrStruct):
     def __init__(self):
         self.TransformerCount = 0
         self.unk = 0
-        self.Transformer1 = zwoTransformer()
-        self.Transformer2 = zwoTransformer()
-        self.OBB = zwoOBB()
+        self.LocalTransformer = zwoTransformer()
+        self.WorldTransformer = zwoTransformer()
+        self.OrientedBoundingBox = zwoOBB()
 
     def __br_read__(self, br:BinaryReader):
         self.TransformerCount = br.read_uint32()
         self.unk = br.read_uint32(self.TransformerCount)
 
         for i in range(self.TransformerCount):
-            self.Transformer1 = br.read_struct(zwoTransformer)
-            self.Transformer2 = br.read_struct(zwoTransformer)
-            self.OBB = br.read_struct(zwoOBB)
+            self.LocalTransformer = br.read_struct(zwoTransformer)
+            self.WorldTransformer = br.read_struct(zwoTransformer)
+            self.OrientedBoundingBox = br.read_struct(zwoOBB)
+    
+    def __br_write__(self, br:BinaryReader):
+        br.write_uint32(self.TransformerCount)
+        br.write_uint32(self.unk)
+
+        for i in range(self.TransformerCount):
+            br.write_struct(self.LocalTransformer)
+            br.write_struct(self.WorldTransformer)
+            br.write_struct(self.OrientedBoundingBox)
 
 
 class zwoTransformer(BrStruct):
@@ -75,6 +126,13 @@ class zwoTransformer(BrStruct):
         self.Scale = zwoVector(br)
         self.Rotation = zwoQuaternion(br)
         self.Matrix = zwoMatrix(br)
+    
+    def __br_write__(self, br: BinaryReader):
+        br.write_float(self.Position)
+        br.write_float(self.Scale)
+        br.write_float(self.Rotation)
+        for m in self.Matrix:
+            br.write_float(m)
         
 class VertexBuffer(BrStruct):
     def __init__(self):
@@ -144,6 +202,25 @@ class VertexBuffer(BrStruct):
             self.Vertices.append(vertex)
         
         #print(f"Vertex Buffer read in {perf_counter() - start} seconds")
+    
+    
+    def __br_write__(self, br:BinaryReader):
+        br.write_uint32(len(self.Vertices))
+        br.write_uint32(self.VertexFlags)
+        
+        for vertex in self.Vertices:
+            br.write_float(vertex.Position)
+            br.write_float(vertex.Normal)
+            
+            for color in vertex.Colors:
+                br.write_uint8(color)
+            
+            for uv in vertex.UVs:
+                br.write_float(uv)
+            
+            for i in range(len(vertex.BoneIndices)):
+                br.write_uint32(vertex.BoneIndices[i])
+                br.write_float(vertex.BoneWeights[i])
         
 
 
@@ -160,17 +237,34 @@ class Vertex(BrStruct):
 class FaceBuffer(BrStruct):
     def __init__(self) -> None:
         self.FaceCount = 0
-        self.unk1 = 0
-        self.unk2 = 0
+        self.TrianglesType = 0
+        self.IndexType = 0
 
         self.Faces = []
     
     def __br_read__(self, br:BinaryReader):
         self.FaceCount = br.read_uint32()
-        self.unk1 = br.read_uint32()
-        self.unk2 = br.read_uint32()
+        self.TrianglesType = br.read_uint32()
+        self.IndexType = br.read_uint32()
 
-        self.Faces = [br.read_struct(Face) for i in range(self.FaceCount)]
+        if self.IndexType == 1:
+            self.Faces = br.read_struct(Face32, self.FaceCount)
+        else:
+            self.Faces = br.read_struct(Face, self.FaceCount)
+    
+    def __br_write__(self, br:BinaryReader):
+        br.write_uint32(len(self.Faces))
+        br.write_uint32(self.TrianglesType)
+        br.write_uint32(self.IndexType)
+        
+        if self.IndexType == 1:
+            for face in self.Faces:
+                br.write_uint32(face.Indices)
+                br.write_uint32(face.MaterialIndex)
+        else:
+            for face in self.Faces:
+                br.write_uint16(face.Indices)
+                br.write_uint16(face.MaterialIndex)
 
 
 class Face(BrStruct):
@@ -181,6 +275,23 @@ class Face(BrStruct):
     def __br_read__(self, br:BinaryReader):
         self.Indices = br.read_uint16(3)
         self.MaterialIndex = br.read_uint16()
+    
+    def __br_write__(self, br:BinaryReader):
+        br.write_uint16(self.Indices)
+        br.write_uint16(self.MaterialIndex)
+
+class Face32(BrStruct):
+    def __init__(self):
+        self.Indices = (0, 0, 0)
+        self.MaterialIndex = 0
+    
+    def __br_read__(self, br:BinaryReader):
+        self.Indices = br.read_uint32(3)
+        self.MaterialIndex = br.read_uint32()
+    
+    def __br_write__(self, br:BinaryReader):
+        br.write_uint32(self.Indices)
+        br.write_uint32(self.MaterialIndex)
 
 
 def ModelToJson(zwoMesh, path):

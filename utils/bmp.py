@@ -1,4 +1,4 @@
-from PyBinaryReader.binary_reader import *
+from .PyBinaryReader.binary_reader import *
 #from PIL import Image
 class BMP(BrStruct):
     def __init__(self):

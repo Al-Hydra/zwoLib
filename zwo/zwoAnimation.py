@@ -1,7 +1,7 @@
-from PyBinaryReader.binary_reader import *
-from zwoEntity import zwoEntity
-from zwoHelpers import zwoVector, zwoQuaternion
-from zwoTypes import zwoTypes
+from ..utils.PyBinaryReader.binary_reader import *
+from .zwoEntity import zwoEntity
+from .zwoHelpers import zwoVector, zwoQuaternion
+from .zwoTypes import zwoTypes
 class zwoAnimation(BrStruct):
     def __init__(self):
         self.Type = zwoTypes.Animation
