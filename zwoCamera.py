@@ -1,6 +1,7 @@
 from PyBinaryReader.binary_reader import *
 from zwoHelpers import zwoVector
 from zwoTypes import zwoTypes
+
 class zwoCamera(BrStruct):
     def __init__(self):
         self.Type = zwoTypes.Camera
@@ -34,3 +35,24 @@ class zwoCamera(BrStruct):
             self.vec2 = zwoVector(br)
             self.vec3 = zwoVector(br)
             self.vec4 = zwoVector(br)
+        
+    
+    def __br_write__(self, br: BinaryReader):
+        br.write_uint32(self.Size)
+        br.write_uint8(self.Flag)
+
+        if (self.Flag -2 ) < 2:
+            br.write_uint32(len(self.Name))
+            br.write_str(self.Name)
+
+            if self.Flag == 0x3:
+                br.write_int32(self.unk1)
+                br.write_int32(self.unk2)
+            
+            br.write_float(self.unkf1)
+            br.write_float(self.unkf2)
+
+            br.write_float(self.vec1)
+            br.write_float(self.vec2)
+            br.write_float(self.vec3)
+            br.write_float(self.vec4)

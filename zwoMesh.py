@@ -135,6 +135,8 @@ class VertexBuffer(BrStruct):
             for u in range(self.UVPerVertex):
                 vertex.UVs.append((br.read_float(), br.read_float()))
             
+            #list(map((br.read_float, br.read_float), range(self.UVPerVertex)))
+            
             for w in range(self.WeightPerVertex):
                 vertex.BoneIndices.append(br.read_uint32())
                 vertex.BoneWeights.append(br.read_float())

@@ -20,6 +20,14 @@ class zwoSkeleton(BrStruct):
         self.BonesCount = br.read_uint32()
         self.unk2 = br.read_uint32()
         self.Bones = [br.read_struct(Bone) for i in range(self.BonesCount)]
+    
+    def __br_write__(self, br: BinaryReader):
+        br.write_struct(self.Entity)
+        br.write_struct(self.Entity3D)
+        br.write_uint32(self.unk1)
+        br.write_uint32(self.BonesCount)
+        br.write_uint32(self.unk2)
+        br.write_struct(self.Bones)
 
 
 class Bone(BrStruct):
@@ -35,3 +43,11 @@ class Bone(BrStruct):
         self.ChildCount = br.read_uint32()
         self.ChildIndices = [br.read_uint32() for i in range(self.ChildCount)]
         self.Matrix = zwoMatrix(br)
+
+    def __br_write__(self, br: BinaryReader):
+        br.write_uint32(self.unk1)
+        br.write_uint32(len(self.Name))
+        br.write_str(self.Name)
+        br.write_uint32(self.ChildCount)
+        br.write_uint32(self.ChildIndices)
+        br.write_float(self.Matrix)

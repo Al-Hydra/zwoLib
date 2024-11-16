@@ -9,6 +9,7 @@ def zwoQuaternion(br: BinaryReader):
 def zwoMatrix(br: BinaryReader):
     return [br.read_float(4), br.read_float(4), br.read_float(4), br.read_float(4)]   
 
+#zwoOBB is something related to collision
 class zwoOBB(BrStruct):
     def __init__(self):
         self.unk1 = 0
@@ -26,6 +27,18 @@ class zwoOBB(BrStruct):
         self.Extents = zwoVector(br)
         self.Orientation = zwoVector(br)
 
+    def __br_write__(self, br: BinaryReader):
+        br.write_uint32(self.unk1)
+        br.write_uint32(self.unk2)
+        br.write_uint32(self.unk3)
+
+        br.write_float(self.Center)
+        br.write_float(self.Extents)
+        br.write_float(self.Orientation)
+
+#zwoTransform is mostly used for rigid objects it defines the position, scale and rotation of an object
+#it's also used for some animations
+#using the position, scale and rotation is the same as using the matrix, so it doesn't really matter which one you use
 class zwoTransformer(BrStruct):
     def __init__(self):
         self.Position = (0, 0, 0)
@@ -39,3 +52,8 @@ class zwoTransformer(BrStruct):
         self.Rotation = zwoQuaternion(br)
         self.Matrix = zwoMatrix(br)
 
+    def __br_write__(self, br: BinaryReader):
+        br.write_float(self.Position)
+        br.write_float(self.Scale)
+        br.write_float(self.Rotation)
+        br.write_float(self.Matrix)

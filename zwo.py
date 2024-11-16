@@ -72,7 +72,7 @@ class zwoFile(BrStruct):
                 
 
 if __name__ == "__main__":
-    zwoPath = r"D:\Games\Obscure 2\adatapack\characters\boy1\skins\boy1_pc.zwo"
+    zwoPath = r"D:\SteamLibrary\steamapps\common\Obscure2\datapack.hvp_out\characters\boy1\skins\boy1_pc.zwo"
     with open(zwoPath, 'rb') as f:
         filebytes = f.read()
 

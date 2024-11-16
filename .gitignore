@@ -1,0 +1,6 @@
+*.pyc
+*.pyc
+converter.py
+/dist
+*.spec
+/__pycache__

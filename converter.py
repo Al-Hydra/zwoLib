@@ -3,6 +3,7 @@ from brDDS import *
 from dds import *
 from bmp import *
 from png import *
+from tga import *
 import zlib
 import PIL
 
@@ -99,7 +100,7 @@ def DDStoPNG(DDS: DDS):
 
 
 if __name__ == "__main__":
-    path = r"D:\SteamLibrary\steamapps\common\Obscure\data\_common\textures\a_door.bmp"
+    '''path = r"D:\SteamLibrary\steamapps\common\Obscure\data\_common\textures\a_door.bmp"
 
     with open(path, "rb") as f:
         data = f.read()
@@ -114,7 +115,7 @@ if __name__ == "__main__":
         pngData = bw.buffer()
     
     with open(path.replace(".bmp", ".png"), "wb") as f:
-        f.write(pngData)
+        f.write(pngData)'''
     
 
     '''path = r"D:\Games\Obscure 2\adatapack\characters\boy2\boy2_pc\b2_hair.dds"
@@ -133,3 +134,5 @@ if __name__ == "__main__":
     
     with open(path.replace(".dds", ".png"), "wb") as f:
         f.write(pngData)'''
+    
+    
